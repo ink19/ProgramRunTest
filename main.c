@@ -6,6 +6,7 @@
 uv_loop_t *loop;
 uv_process_t child_req;
 u_int64_t begin_time;
+uv_timer_t timer;
 char *program = "./TestProgram.bin";
 char *program_argv[] = {
     "./TestProgram.bin",
@@ -15,6 +16,7 @@ char *program_argv[] = {
 
 void pon_exit(uv_process_t *req, int64_t exit_status, int term_signal)  {
     printf("Exit.\n");
+    uv_timer_stop(&timer);
     uv_close((uv_handle_t *)req, NULL);
 }
 
@@ -29,7 +31,7 @@ int main() {
     loop = uv_default_loop();
     begin_time = uv_now(loop);
     char sleep_time[100];
-    sprintf(sleep_time, "%d", 10);
+    sprintf(sleep_time, "%d", 2);
     program_argv[1] = sleep_time;
     
     uv_process_options_t options = {0};
@@ -48,7 +50,7 @@ int main() {
     if ((r = uv_spawn(loop, &child_req, &options))) {
         printf("%s\n", uv_strerror(r));
     } 
-    uv_timer_t timer;
+    
     uv_timer_init(loop, &timer);
     uv_timer_start(&timer, ton_stop, 5000, 0);
     return uv_run(loop, UV_RUN_DEFAULT);
