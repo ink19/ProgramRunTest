@@ -31,7 +31,7 @@ int main() {
     loop = uv_default_loop();
     begin_time = uv_now(loop);
     char sleep_time[100];
-    sprintf(sleep_time, "%d", 2);
+    sprintf(sleep_time, "%d", 7);
     program_argv[1] = sleep_time;
     
     uv_process_options_t options = {0};
