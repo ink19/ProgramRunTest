@@ -3,3 +3,5 @@
 *.out
 TaskRunLimit
 TestProgram.bin
+err/
+out/
