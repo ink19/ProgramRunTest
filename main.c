@@ -9,7 +9,7 @@ int main() {
         "",
         NULL
     };
-    run_task_init(100, 5, 2000, program_v, 3);
+    run_task_init(100, 5, 2000, program_v, 3, 1);
     run_task_start();
     run_task_destroy();
     return 0;

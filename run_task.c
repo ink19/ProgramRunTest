@@ -1,8 +1,9 @@
 #include "run_task.h"
 
-int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time, char *program_v[], int64_t program_arg_length) {
+int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time, char *program_v[], int64_t program_arg_length, u_int64_t _argv_loop_n) {
     //初始化运行参数
     task_sum = sum;
+    argv_loop_n = _argv_loop_n;
     task_number = thread_number;
     limit_time = plimit_time;
     loop = uv_default_loop();
@@ -23,7 +24,7 @@ int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time,
         for (int j = 0; j < program_arg_length; j++) {
             (task + i)->program_argv[j] = program_v[j];
         }
-        (task + i)->program_argv[1] = (char *)malloc(sizeof(char) * 100);
+        (task + i)->program_argv[argv_loop_n] = (char *)malloc(sizeof(char) * 100);
         memset(&((task + i)->option), sizeof(uv_process_t), 0);
 
         (task + i)->option.stdio_count = 3;
@@ -44,12 +45,13 @@ int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time,
     }
     uv_idle_init(loop, &start_thread);
     uv_idle_start(&start_thread, start_task_loop);
+    start_thread_flag = 1;
 }
 
 int run_task_destroy() {
     free(task_queue.data);
     for (int i = 0; i < task_number; i++) {
-        free(task[i].program_argv[1]);
+        free(task[i].program_argv[argv_loop_n]);
         free(task[i].program_argv);
         free((task + i)->option.stdio);
         uv_fs_req_cleanup(&task[i].file_req);
@@ -63,12 +65,15 @@ void start_task_loop(uv_idle_t *handle) {
         uv_idle_stop(handle);
         return;
     }
+
     while (task_queue.head != task_queue.tail) {
         uint64_t start_id = task_queue.data[task_queue.tail++];
         task_queue.tail %= task_queue.length;
         //fprintf(stderr, "%d,%d,%d\n", task_queue.head, task_queue.tail, start_id);
         start_task(start_id);
     }
+    uv_idle_stop(handle);
+    start_thread_flag = 0;
 }
 
 int start_task(u_int64_t number) {
@@ -76,7 +81,7 @@ int start_task(u_int64_t number) {
     uv_timer_init(loop, &((task + number)->timer));
 
     (task + number)->begin_time = uv_now(loop);
-    sprintf((task + number)->program_argv[1], "%d", now_task_id);
+    sprintf((task + number)->program_argv[argv_loop_n], "%d", now_task_id);
 
     now_task_id++;
     sprintf((task + number)->filename, "%s%d.data", OUTDIR, (task + number)->task_id);
@@ -148,13 +153,16 @@ void process_on_exit(uv_process_t *handle, int64_t exit_status, int term_signal)
     int task_id = (task + process_id)->task_id;
 
     uv_timer_stop(&((task + process_id)->timer));
-    if (!uv_is_closing(&(task + process_id)->timer)) {
+    if (!uv_is_closing((uv_handle_t *)&(task + process_id)->timer)) {
         uv_close((uv_handle_t *)&((task + process_id)->timer), NULL);
     }
     uv_fs_close(loop, &(task[process_id].file_req), task[process_id].out, file_close_cb);
 
     fprintf(stdout, "%ld,%ld\n", task_id, uv_now(loop) - (task + process_id)->begin_time);
     uv_close((uv_handle_t *)handle, NULL);
+    if (start_thread_flag == 0) {
+        uv_idle_start(&start_thread, start_task_loop);
+    }
     // task_queue.data[task_queue.head++] = process_id;
     // task_queue.head %= task_queue.length;
 }

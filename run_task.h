@@ -34,13 +34,15 @@ static task_t *task;
 //启动进程的idle循环
 static uv_idle_t start_thread;
 static task_queue_t task_queue;
+static int start_thread_flag = 0;
 
+static u_int64_t argv_loop_n = 2;
 static u_int64_t task_number = 3;
 static u_int64_t task_sum = 100;
 static u_int64_t now_task_id = 0;
 static u_int64_t limit_time = 20000;
 
-int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time, char *program_argv[], int64_t program_arg_length);
+int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time, char *program_argv[], int64_t program_arg_length, u_int64_t _argv_loop_n);
 int start_task(u_int64_t number);
 int run_task_start();
 int run_task_destroy();
