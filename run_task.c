@@ -144,6 +144,10 @@ void file_close_cb(uv_fs_t* req) {
         task[process_id].err = -1;
         task_queue.data[task_queue.head++] = process_id;
         task_queue.head %= task_queue.length;
+        if (start_thread_flag == 0) {
+            uv_idle_start(&start_thread, start_task_loop);
+            start_thread_flag = 1;
+        }
         return;
     }
 }
@@ -160,9 +164,7 @@ void process_on_exit(uv_process_t *handle, int64_t exit_status, int term_signal)
 
     fprintf(stdout, "%ld,%ld\n", task_id, uv_now(loop) - (task + process_id)->begin_time);
     uv_close((uv_handle_t *)handle, NULL);
-    if (start_thread_flag == 0) {
-        uv_idle_start(&start_thread, start_task_loop);
-    }
+    
     // task_queue.data[task_queue.head++] = process_id;
     // task_queue.head %= task_queue.length;
 }
