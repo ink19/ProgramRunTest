@@ -1,5 +1,7 @@
 all: TaskRunLimit
 
+CC=gcc
+
 CFLAGS+=-g
 
 TaskRunLimit: main.o run_task.o

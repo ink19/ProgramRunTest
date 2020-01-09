@@ -3,7 +3,12 @@
 #include <string.h>
 #include "run_task.h"
 
+#define DEBUG_LOG 1
+
+#include "log.h"
+
 int main() {
+    log_init(stderr);
     char *program_v[] = {
         "java",
         "-jar",
@@ -16,5 +21,6 @@ int main() {
     run_task_init(1800, 2, 600000, program_v, 7, 3);
     run_task_start();
     run_task_destroy();
+    log_destroy(stderr);
     return 0;
 }

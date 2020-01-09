@@ -66,64 +66,73 @@ void start_task_loop(uv_idle_t *handle) {
         return;
     }
 
+    //开启新的进程，首先开启文件读写
     while (task_queue.head != task_queue.tail) {
         uint64_t start_id = task_queue.data[task_queue.tail++];
         task_queue.tail %= task_queue.length;
-        //fprintf(stderr, "%d,%d,%d\n", task_queue.head, task_queue.tail, start_id);
+        fprintf(stderr, "%d,%d,%d\n", task_queue.head, task_queue.tail, start_id);
         start_task(start_id);
     }
+
+    //停止循环，节省CPU
     uv_idle_stop(handle);
+
+    //flag置零
     start_thread_flag = 0;
 }
 
+
+//开启任务
 int start_task(u_int64_t number) {
-    (task + number)->task_id = now_task_id;
+    //初始化计时器时间
     uv_timer_init(loop, &((task + number)->timer));
-
-    (task + number)->begin_time = uv_now(loop);
+    
+    //输入参数
+    (task + number)->task_id = now_task_id;
     sprintf((task + number)->program_argv[argv_loop_n], "%d", now_task_id);
-
+    
+    //打开文件读写
     now_task_id++;
     sprintf((task + number)->filename, "%s%d.data", OUTDIR, (task + number)->task_id);
     uv_fs_open(loop, &((task + number)->file_req), (task + number)->filename, O_RDWR|O_CREAT|O_TRUNC, 0644, file_open_cb);
-
-    // int return_id = 0;
-    // if ((return_id = uv_spawn(loop, &((task + number)->process), &((task + number)->option)))) {
-    //     fprintf(stderr, "%s\n", uv_strerror(return_id));
-    // }
-
-    // uv_timer_start(&((task + number)->timer), timer_on_exit, limit_time, 0);
-    // now_task_id++;
     return 0;
 }
 
 void file_open_cb(uv_fs_t* req) {
     int process_id = (int)(req->data);
     int task_id = (task + process_id)->task_id;
+    //判断是否完成文件打开操作
     if (task[process_id].out == -1) {
         task[process_id].out = req->result;
+        //打开错误输出文件
         sprintf((task + process_id)->filename, "%s%d.data", ERRDIR, (task + process_id)->task_id);
         uv_fs_open(loop, &((task + process_id)->file_req), (task + process_id)->filename, O_RDWR|O_CREAT|O_TRUNC, 0644, file_open_cb);
         return;
     } else {
+        //完成文件打开
         task[process_id].err = req->result;
         //printf("fd:%d,%d\n", task[process_id].out, task[process_id].err);
         //printf("%s\n", req->path);
         (task + process_id)->option.stdio[1].data.fd = task[process_id].out;
         (task + process_id)->option.stdio[2].data.fd = task[process_id].err;
+        //开启进程
         int return_id = 0;
         if ((return_id = uv_spawn(loop, &((task + process_id)->process), &((task + process_id)->option)))) {
             fprintf(stderr, "%s\n", uv_strerror(return_id));
         }
+        //开启计时器
+        (task + process_id)->begin_time = uv_now(loop);
         uv_timer_start(&((task + process_id)->timer), timer_on_exit, limit_time, 0);
         return;
     }
 }
 
+//运行主循环
 int run_task_start() {
     return uv_run(loop, UV_RUN_DEFAULT);
 }
 
+//计时器退出函数
 void timer_on_exit(uv_timer_t * handle) {
     int process_id = (int)handle->data;
     int task_id = (task + process_id)->task_id;
@@ -135,6 +144,7 @@ void timer_on_exit(uv_timer_t * handle) {
 void file_close_cb(uv_fs_t* req) {
     int process_id = (int)(req->data);
     int task_id = (task + process_id)->task_id;
+    //判断是否完成进程文件的关闭
     if (task[process_id].out != -1) {
         //printf("out_id:%d\n", task[process_id].out);
         task[process_id].out = -1;
@@ -142,6 +152,8 @@ void file_close_cb(uv_fs_t* req) {
         return;
     } else {
         task[process_id].err = -1;
+
+        //压入任务
         task_queue.data[task_queue.head++] = process_id;
         task_queue.head %= task_queue.length;
         if (start_thread_flag == 0) {
@@ -156,13 +168,18 @@ void process_on_exit(uv_process_t *handle, int64_t exit_status, int term_signal)
     int process_id = (int)handle->data;
     int task_id = (task + process_id)->task_id;
 
+    //关闭计时器
     uv_timer_stop(&((task + process_id)->timer));
     if (!uv_is_closing((uv_handle_t *)&(task + process_id)->timer)) {
         uv_close((uv_handle_t *)&((task + process_id)->timer), NULL);
     }
+
+    //关闭文件读写
     uv_fs_close(loop, &(task[process_id].file_req), task[process_id].out, file_close_cb);
 
+    //打印时间
     fprintf(stdout, "%ld,%ld\n", task_id, uv_now(loop) - (task + process_id)->begin_time);
+    fprintf(stderr, "%ld,%ld\n", task_id, uv_now(loop) - (task + process_id)->begin_time);
     uv_close((uv_handle_t *)handle, NULL);
     
     // task_queue.data[task_queue.head++] = process_id;
