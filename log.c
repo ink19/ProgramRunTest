@@ -3,9 +3,9 @@
 static FILE * log_fd;
 static pthread_mutex_t log_mutex;
 
-extern int log_init(FILE *log_fd) {
+extern int log_init(FILE *plog_fd) {
 #if DEBUG_LOG == 1
-    log_fd = log_fd;
+    log_fd = plog_fd;
     pthread_mutex_init(&log_mutex, NULL);
 #endif
     return 0;

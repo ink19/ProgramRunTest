@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <uv.h>
-
+#include "log.h"
+#include "record.h"
 #define ERRDIR "./err/"
 #define OUTDIR "./out/"
 

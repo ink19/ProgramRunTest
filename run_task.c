@@ -2,6 +2,7 @@
 
 int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time, char *program_v[], int64_t program_arg_length, u_int64_t _argv_loop_n) {
     //初始化运行参数
+    record_init("runtime.data");
     task_sum = sum;
     argv_loop_n = _argv_loop_n;
     task_number = thread_number;
@@ -49,6 +50,7 @@ int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time,
 }
 
 int run_task_destroy() {
+    record_destroy();
     free(task_queue.data);
     for (int i = 0; i < task_number; i++) {
         free(task[i].program_argv[argv_loop_n]);
@@ -70,7 +72,7 @@ void start_task_loop(uv_idle_t *handle) {
     while (task_queue.head != task_queue.tail) {
         uint64_t start_id = task_queue.data[task_queue.tail++];
         task_queue.tail %= task_queue.length;
-        fprintf(stderr, "%d,%d,%d\n", task_queue.head, task_queue.tail, start_id);
+        log_data("INFO", "OUT %d,%d,%d", task_queue.head, task_queue.tail, start_id);
         start_task(start_id);
     }
 
@@ -156,6 +158,7 @@ void file_close_cb(uv_fs_t* req) {
         //压入任务
         task_queue.data[task_queue.head++] = process_id;
         task_queue.head %= task_queue.length;
+        log_data("INFO", "IN %d,%d,%d", task_queue.head, task_queue.tail, process_id);
         if (start_thread_flag == 0) {
             uv_idle_start(&start_thread, start_task_loop);
             start_thread_flag = 1;
@@ -178,8 +181,8 @@ void process_on_exit(uv_process_t *handle, int64_t exit_status, int term_signal)
     uv_fs_close(loop, &(task[process_id].file_req), task[process_id].out, file_close_cb);
 
     //打印时间
-    fprintf(stdout, "%ld,%ld\n", task_id, uv_now(loop) - (task + process_id)->begin_time);
-    fprintf(stderr, "%ld,%ld\n", task_id, uv_now(loop) - (task + process_id)->begin_time);
+    record_data("%ld,%ld", task_id, uv_now(loop) - (task + process_id)->begin_time);
+    log_data("INFO", "%ld,%ld", task_id, uv_now(loop) - (task + process_id)->begin_time);
     uv_close((uv_handle_t *)handle, NULL);
     
     // task_queue.data[task_queue.head++] = process_id;
