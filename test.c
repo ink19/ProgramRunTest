@@ -4,15 +4,32 @@
 #include <ncurses.h>
 #include <unistd.h>
 #include <getopt.h>
-
+#include <stdint.h>
 int main(int argc, char *argv[]) {
     int opt;
-    char *optstring = "a::b:c:d";
+    uint64_t task_number, process_number, time_limit;
+    char *optstring = "s:p:t:";
     while ((opt = getopt(argc, argv, optstring)) != -1) {
-        printf("opt = %c\t\t", opt);
-        printf("optarg = %s\t\t",optarg);
-        printf("optind = %d\t\t",optind);
-        printf("argv[optind] = %s\n",argv[optind]);
+        switch (opt)
+        {
+        case 's':
+            task_number = atol(optarg);
+            printf("Task %ld\n", task_number);
+            break;
+        case 'p':
+            process_number = atol(optarg);
+            printf("Process %ld\n", process_number);
+            break;
+        case 't':
+            time_limit = atol(optarg);
+            printf("Time_limit: %ld\n", time_limit);
+            break;
+        default:
+            break;
+        }
     }
+    printf("%d %d\n", argc, optind);
+    
+    
     return 0;
 }

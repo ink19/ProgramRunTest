@@ -88,7 +88,7 @@ extern int termview_refresh() {
     int loop_index = (info_begin_index + INFO_LIST_LENGTH - 1)%INFO_LIST_LENGTH;
     while (getcury(stdscr) < getmaxy(stdscr) - 1) {
         if (info_list[loop_index] == NULL) break;
-        printw("%s |%d %d\n", info_list[loop_index], getcury(stdscr), getmaxy(stdscr));
+        printw("%s\n", info_list[loop_index], getcury(stdscr), getmaxy(stdscr));
         loop_index = (loop_index + INFO_LIST_LENGTH - 1)%INFO_LIST_LENGTH;
         if (loop_index == info_begin_index) break;
     }

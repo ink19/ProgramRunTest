@@ -32,11 +32,12 @@ int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time,
     //初始化每一个进程
     for (int i = 0; i < thread_number; i++) {
         //初始化参数
-        (task + i)->program_argv = (char **)malloc(sizeof(char *) * program_arg_length);
+        (task + i)->program_argv = (char **)malloc(sizeof(char *) * (program_arg_length + 1));
         for (int j = 0; j < program_arg_length; j++) {
             (task + i)->program_argv[j] = program_v[j];
         }
         (task + i)->program_argv[argv_loop_n] = (char *)malloc(sizeof(char) * 100);
+        (task + i)->program_argv[program_arg_length] = NULL;
         memset(&((task + i)->option), sizeof(uv_process_t), 0);
 
         (task + i)->option.stdio_count = 3;
