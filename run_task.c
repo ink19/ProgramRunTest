@@ -3,12 +3,13 @@
 int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time, char *program_v[], int64_t program_arg_length, u_int64_t _argv_loop_n) {
     //初始化运行参数
     record_init("runtime.data");
+    termview_init(sum, thread_number);
     task_sum = sum;
     argv_loop_n = _argv_loop_n;
     task_number = thread_number;
     limit_time = plimit_time;
     loop = uv_default_loop();
-    task = (task_t *)malloc(sizeof(task_t) * thread_number);
+    task = (mtask_t *)malloc(sizeof(mtask_t) * thread_number);
     
     //初始化队列
     task_queue.head = 0;
@@ -48,6 +49,8 @@ int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time,
     uv_idle_start(&start_thread, start_task_loop);
     start_thread_flag = 1;
 }
+
+
 
 int run_task_destroy() {
     record_destroy();

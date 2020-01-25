@@ -7,6 +7,7 @@
 #include <uv.h>
 #include "log.h"
 #include "record.h"
+#include "termview.h"
 #define ERRDIR "./err/"
 #define OUTDIR "./out/"
 
@@ -28,10 +29,10 @@ typedef struct {
     uv_fs_t file_req;
     u_int64_t task_id;
     char filename[100];
-} task_t;
+} mtask_t;
 
 static uv_loop_t *loop;
-static task_t *task;
+static mtask_t *task;
 //启动进程的idle循环
 static uv_idle_t start_thread;
 static task_queue_t task_queue;

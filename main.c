@@ -8,15 +8,12 @@
 int main() {
     log_init(stderr);
     char *program_v[] = {
-        "java",
-        "-jar",
-        "MAPFRScala.jar",
+        "python",
+        "CAPGRun.py",
         "",
-        "1",
-        "1",
         NULL
     };
-    run_task_init(1800, 2, 600000, program_v, 7, 3);
+    run_task_init(201, 2, 600000, program_v, 4, 2);
     run_task_start();
     run_task_destroy();
     log_destroy();
