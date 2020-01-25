@@ -31,15 +31,18 @@ extern int termview_update_process(u_int64_t process_id, u_int64_t run_id, u_int
 
 extern int termview_refresh() {
     int scrh, scrw;
-    int linebuff[1024];
+    char linebuff[1024];
     int shape_number = 0;
     clear();
     getmaxyx(stdscr, scrh, scrw);
     sprintf(linebuff, "%ld/%ld", now_task, task_number);
     shape_number = (scrw - strlen(linebuff) - 4) * now_task / task_number;
     addch('[');
-    while(shape_number--) {
+    for(int loop_i = 0; loop_i < shape_number; ++loop_i) {
         addch('#');
+    }
+    for (int loop_i = 0; loop_i < scrw - strlen(linebuff) - 4 - shape_number; ++loop_i) {
+        addch('-');
     }
     addch(']');
     mvprintw(0, scrw - strlen(linebuff) - 1, linebuff);

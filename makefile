@@ -6,10 +6,12 @@ CFLAGS+=-g
 
 LDFLAGS+=-L/usr/lib64 -luv -lcurses
 
-TaskRunLimit: main.o run_task.o log.o record.o
+TaskRunLimit: main.o run_task.o log.o record.o termview.o
 	gcc $^ -o $@ $(LDFLAGS)
 
 main.o: main.c run_task.h
+
+termview.o: termview.c termview.h
 
 record.o: record.h record.c
 

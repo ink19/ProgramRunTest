@@ -8,12 +8,11 @@
 int main() {
     log_init(stderr);
     char *program_v[] = {
-        "python",
-        "CAPGRun.py",
+        "./TestProgram.bin",
         "",
         NULL
     };
-    run_task_init(201, 2, 600000, program_v, 4, 2);
+    run_task_init(201, 2, 10000, program_v, 3, 1);
     run_task_start();
     run_task_destroy();
     log_destroy();

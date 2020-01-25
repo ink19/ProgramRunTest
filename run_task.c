@@ -1,7 +1,11 @@
 #include "run_task.h"
 
-static int run_task_view_refresh(uv_timer_t * handle) {
+static void run_task_view_refresh(uv_timer_t * handle) {
     termview_update_task(over_task);
+    for (u_int64_t loop_i = 0; loop_i < task_number; ++loop_i) {
+        termview_update_process(loop_i, task[loop_i].task_id, uv_now(loop) - task[loop_i].begin_time);
+    }
+    termview_refresh();
 }
 
 int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time, char *program_v[], int64_t program_arg_length, u_int64_t _argv_loop_n) {
@@ -51,13 +55,16 @@ int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time,
     }
     uv_idle_init(loop, &start_thread);
     uv_idle_start(&start_thread, start_task_loop);
+    uv_timer_init(loop, &ui_refresh);
+    uv_timer_start(&ui_refresh, run_task_view_refresh, 10, 1000);
     start_thread_flag = 1;
 }
 
 
-
 int run_task_destroy() {
     record_destroy();
+    termview_destroy();
+    
     free(task_queue.data);
     for (int i = 0; i < task_number; i++) {
         free(task[i].program_argv[argv_loop_n]);
@@ -72,6 +79,8 @@ int run_task_destroy() {
 void start_task_loop(uv_idle_t *handle) {
     if (now_task_id >= task_sum) {
         uv_idle_stop(handle);
+        uv_timer_stop(&ui_refresh);
+        uv_close((uv_handle_t *)&ui_refresh, NULL);
         return;
     }
 
@@ -177,7 +186,7 @@ void file_close_cb(uv_fs_t* req) {
 void process_on_exit(uv_process_t *handle, int64_t exit_status, int term_signal) {
     int process_id = (int)handle->data;
     int task_id = (task + process_id)->task_id;
-
+    over_task++;
     //关闭计时器
     uv_timer_stop(&((task + process_id)->timer));
     if (!uv_is_closing((uv_handle_t *)&(task + process_id)->timer)) {

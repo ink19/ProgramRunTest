@@ -10,6 +10,7 @@ extern int record_init(char *filename) {
 }
 
 extern int record_data(char *format, ...) {
+    return 0;
     va_list arg_list;
     va_start(arg_list, format);
     pthread_mutex_lock(&record_mutex);
