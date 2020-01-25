@@ -3,25 +3,16 @@
 #include <string.h>
 #include <ncurses.h>
 #include <unistd.h>
+#include <getopt.h>
 
-int main() {
-    initscr();
-    mvprintw(5, 5, "Hello world!");
-    int scrh, scrw;
-    for (int loop_i = 100; loop_i > 0; --loop_i) {
-        //clear();
-        getmaxyx(stdscr, scrh, scrw);
-        
-        move(0, 0);
-        for (int loop_j = 0; loop_j < loop_i; ++loop_j) {
-            printw("#");
-        }
-        mvprintw(0, scrw - 10, "Test");
-        printw("\n");
-        refresh();
-        sleep(1);
+int main(int argc, char *argv[]) {
+    int opt;
+    char *optstring = "a::b:c:d";
+    while ((opt = getopt(argc, argv, optstring)) != -1) {
+        printf("opt = %c\t\t", opt);
+        printf("optarg = %s\t\t",optarg);
+        printf("optind = %d\t\t",optind);
+        printf("argv[optind] = %s\n",argv[optind]);
     }
-    getch();
-    endwin();
     return 0;
 }

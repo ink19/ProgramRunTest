@@ -5,7 +5,6 @@ static u_int64_t process_number = 0;
 static u_int64_t now_task = 0;
 static termview_process_t *process_data;
 
-
 extern int termview_init(u_int64_t _task_number, u_int64_t _process_number) {
     task_number = _task_number;
     process_number = _process_number;
