@@ -19,5 +19,4 @@ extern int termview_addinfo(char *info);
 extern int termview_refresh();
 extern int termview_destroy();
 
-
 #endif

@@ -12,7 +12,7 @@ int main() {
         "",
         NULL
     };
-    run_task_init(201, 2, 10000, program_v, 3, 1);
+    run_task_init(20, 2, 10000, program_v, 3, 1);
     run_task_start();
     run_task_destroy();
     log_destroy();

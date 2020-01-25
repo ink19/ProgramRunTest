@@ -78,7 +78,7 @@ int run_task_destroy() {
 }
 
 void start_task_loop(uv_idle_t *handle) {
-    if (now_task_id >= task_sum) {
+    if (now_task_id > task_sum) {
         uv_idle_stop(handle);
         uv_timer_stop(&ui_refresh);
         uv_close((uv_handle_t *)&ui_refresh, NULL);
