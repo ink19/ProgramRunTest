@@ -1,5 +1,9 @@
 #include "run_task.h"
 
+static int run_task_view_refresh(uv_timer_t * handle) {
+    termview_update_task(over_task);
+}
+
 int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time, char *program_v[], int64_t program_arg_length, u_int64_t _argv_loop_n) {
     //初始化运行参数
     record_init("runtime.data");

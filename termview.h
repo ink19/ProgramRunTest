@@ -6,13 +6,13 @@
 #include <ncurses.h>
 
 typedef struct {
-    int task_id;
-    int run_time;
+    u_int64_t task_id;
+    u_int64_t run_time;
 } termview_process_t;
 
-extern int termview_init(int task_number, int process_number);
-extern int termview_update_task(int over_task);
-extern int termview_update_process(int process_id, int run_id, int run_time);
+extern int termview_init(u_int64_t task_number, u_int64_t process_number);
+extern int termview_update_task(u_int64_t over_task);
+extern int termview_update_process(u_int64_t process_id, u_int64_t run_id, u_int64_t run_time);
 extern int termview_refresh();
 extern int termview_destroy();
 
