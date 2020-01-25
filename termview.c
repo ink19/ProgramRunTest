@@ -4,6 +4,9 @@ static u_int64_t task_number = 0;
 static u_int64_t process_number = 0;
 static u_int64_t now_task = 0;
 static termview_process_t *process_data;
+static char *info_list[INFO_LIST_LENGTH];
+static char info_begin_index = 0;
+
 
 extern int termview_init(u_int64_t _task_number, u_int64_t _process_number) {
     task_number = _task_number;
@@ -13,8 +16,25 @@ extern int termview_init(u_int64_t _task_number, u_int64_t _process_number) {
         process_data[loop_i].run_time = 0;
         process_data[loop_i].task_id = 0;
     }
+    for (int loop_i = 0; loop_i < 10; ++loop_i) {
+        info_list[loop_i] = NULL;
+    }
     initscr();
     termview_refresh();
+    return 0;
+}
+
+extern int termview_addinfo(char *info) {
+    // int loop_index = (info_begin_index + 9) % 10;
+    // while (info_list[loop_index] != NULL) {
+
+    // }
+    if (info_list[info_begin_index] != NULL) {
+        free(info_list[info_begin_index]);
+    } 
+    info_list[info_begin_index] = info;
+    info_begin_index += 1;
+    info_begin_index %= INFO_LIST_LENGTH;
     return 0;
 }
 
@@ -55,12 +75,23 @@ extern int termview_refresh() {
         mvprintw(loop_i + 2, scrw - strlen(linebuff) - 1, linebuff);
         printw("\n");
     }
+    printw("--------------\n");
+    int loop_index = (info_begin_index + INFO_LIST_LENGTH - 1)%INFO_LIST_LENGTH;
+    while (getcury(stdscr) < getmaxy(stdscr) - 1) {
+        if (info_list[loop_index] == NULL) break;
+        printw("%s |%d %d\n", info_list[loop_index], getcury(stdscr), getmaxy(stdscr));
+        loop_index = (loop_index + INFO_LIST_LENGTH - 1)%INFO_LIST_LENGTH;
+        if (loop_index == info_begin_index) break;
+    }
     refresh();
     return 0;
 }
 
 extern int termview_destroy() {
     free(process_data);
+    for (int loop_i = 0; loop_i < 10; ++loop_i) {
+        free(info_list[loop_i]);
+    }
     endwin();
     return 0;
 }
