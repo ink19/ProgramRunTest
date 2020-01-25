@@ -1,5 +1,6 @@
 #include "run_task.h"
 
+//刷新UI
 static void run_task_view_refresh(uv_timer_t * handle) {
     termview_update_task(over_task);
     for (u_int64_t loop_i = 0; loop_i < task_number; ++loop_i) {
@@ -8,6 +9,7 @@ static void run_task_view_refresh(uv_timer_t * handle) {
     termview_refresh();
 }
 
+//初始化
 int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time, char *program_v[], int64_t program_arg_length, u_int64_t _argv_loop_n) {
     //初始化运行参数
     record_init("runtime.data");
@@ -59,7 +61,6 @@ int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time,
     uv_timer_start(&ui_refresh, run_task_view_refresh, 10, 1000);
     start_thread_flag = 1;
 }
-
 
 int run_task_destroy() {
     record_destroy();
