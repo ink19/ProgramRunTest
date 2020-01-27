@@ -8,6 +8,7 @@ static task_queue_t task_queue;
 static int start_thread_flag = 0;
 
 //刷新UI
+static int ui_refresh_flags = 0;
 static uv_timer_t ui_refresh;
 
 static u_int64_t argv_loop_n = 2;
@@ -19,8 +20,23 @@ static u_int64_t over_task = 0;
 
 //刷新UI
 static void run_task_view_refresh(uv_timer_t * handle) {
+    int stop_process = 0;
+    for (int loop_i = 0; loop_i < process_number; ++loop_i) {
+        if (process_list[loop_i].err == -1) {
+            stop_process++;
+        }
+    }
+    if (ui_refresh_flags && stop_process == process_number) {
+        uv_timer_stop(&ui_refresh);
+        uv_close((uv_handle_t *)&ui_refresh, NULL);
+    }
     termview_update_task(over_task);
     for (u_int64_t loop_i = 0; loop_i < process_number; ++loop_i) {
+        if (uv_is_closing((uv_handle_t *)&process_list[loop_i].timer)) {
+            termview_update_process(loop_i, process_list[loop_i].task_id, 0);
+        } else {
+            termview_update_process(loop_i, process_list[loop_i].task_id, uv_now(loop) - process_list[loop_i].begin_time);
+        }
         termview_update_process(loop_i, process_list[loop_i].task_id, uv_now(loop) - process_list[loop_i].begin_time);
     }
     termview_refresh();
@@ -30,10 +46,10 @@ static void run_task_view_refresh(uv_timer_t * handle) {
 int run_task_init(u_int64_t sum, u_int64_t _process_number, u_int64_t plimit_time, char *program_v[], int64_t program_arg_length, u_int64_t _argv_loop_n) {
     //初始化运行参数
     record_init("runtime.data");
-    termview_init(sum, process_number);
+    termview_init(sum, _process_number);
     task_sum = sum;
     argv_loop_n = _argv_loop_n;
-    process_number = process_number;
+    process_number = _process_number;
     limit_time = plimit_time;
     loop = uv_default_loop();
     process_list = (run_process_t *)malloc(sizeof(run_process_t) * process_number);
@@ -98,8 +114,7 @@ int run_task_destroy() {
 void start_task_loop(uv_idle_t *handle) {
     if (now_task_id > task_sum) {
         uv_idle_stop(handle);
-        uv_timer_stop(&ui_refresh);
-        uv_close((uv_handle_t *)&ui_refresh, NULL);
+        ui_refresh_flags = 1;
         return;
     }
 
