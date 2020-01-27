@@ -8,7 +8,7 @@
 int main(int argc, char *argv[]) {
     int opt;
     uint64_t task_number, process_number, time_limit, loop_arg;
-    char *optstring = "s:p:t:";
+    char *optstring = "s:p:t:h";
     while ((opt = getopt(argc, argv, optstring)) != -1) {
         switch (opt)
         {
@@ -20,6 +20,14 @@ int main(int argc, char *argv[]) {
             break;
         case 't':
             time_limit = atol(optarg);
+            break;
+
+        case 'h':
+            printf("Usage: \t -h 打印帮助\n");
+            printf("\t -s 设置总数\n");
+            printf("\t -p 设置进程数\n");
+            printf("\t -t 设置时间限制\n");
+            return;
             break;
         default:
             break;
