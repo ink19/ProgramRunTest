@@ -11,7 +11,7 @@ static int start_thread_flag = 0;
 static uv_timer_t ui_refresh;
 
 static u_int64_t argv_loop_n = 2;
-static u_int64_t task_number = 3;
+static u_int64_t process_number = 3;
 static u_int64_t task_sum = 100;
 static u_int64_t now_task_id = 1;
 static u_int64_t limit_time = 20000;
@@ -20,20 +20,20 @@ static u_int64_t over_task = 0;
 //刷新UI
 static void run_task_view_refresh(uv_timer_t * handle) {
     termview_update_task(over_task);
-    for (u_int64_t loop_i = 0; loop_i < task_number; ++loop_i) {
+    for (u_int64_t loop_i = 0; loop_i < process_number; ++loop_i) {
         termview_update_process(loop_i, process_list[loop_i].task_id, uv_now(loop) - process_list[loop_i].begin_time);
     }
     termview_refresh();
 }
 
 //初始化
-int run_task_init(u_int64_t sum, u_int64_t process_number, u_int64_t plimit_time, char *program_v[], int64_t program_arg_length, u_int64_t _argv_loop_n) {
+int run_task_init(u_int64_t sum, u_int64_t _process_number, u_int64_t plimit_time, char *program_v[], int64_t program_arg_length, u_int64_t _argv_loop_n) {
     //初始化运行参数
     record_init("runtime.data");
     termview_init(sum, process_number);
     task_sum = sum;
     argv_loop_n = _argv_loop_n;
-    task_number = process_number;
+    process_number = process_number;
     limit_time = plimit_time;
     loop = uv_default_loop();
     process_list = (run_process_t *)malloc(sizeof(run_process_t) * process_number);
@@ -85,7 +85,7 @@ int run_task_destroy() {
     termview_destroy();
     
     free(task_queue.data);
-    for (int i = 0; i < task_number; i++) {
+    for (int i = 0; i < process_number; i++) {
         free(process_list[i].program_argv[argv_loop_n]);
         free(process_list[i].program_argv);
         free((process_list + i)->option.stdio);
