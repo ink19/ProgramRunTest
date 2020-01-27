@@ -1,5 +1,22 @@
 #include "run_task.h"
 
+static uv_loop_t *loop;
+static mtask_t *task;
+//启动进程的idle循环
+static uv_idle_t start_thread;
+static task_queue_t task_queue;
+static int start_thread_flag = 0;
+
+//刷新UI
+static uv_timer_t ui_refresh;
+
+static u_int64_t argv_loop_n = 2;
+static u_int64_t task_number = 3;
+static u_int64_t task_sum = 100;
+static u_int64_t now_task_id = 1;
+static u_int64_t limit_time = 20000;
+static u_int64_t over_task = 0;
+
 //刷新UI
 static void run_task_view_refresh(uv_timer_t * handle) {
     termview_update_task(over_task);
