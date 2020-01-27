@@ -43,10 +43,19 @@ static void run_task_view_refresh(uv_timer_t * handle) {
 }
 
 //初始化
-int run_task_init(u_int64_t sum, u_int64_t _process_number, u_int64_t plimit_time, char *program_v[], int64_t program_arg_length, u_int64_t _argv_loop_n) {
+int run_task_init(u_int64_t begin, u_int64_t sum, u_int64_t _process_number, u_int64_t plimit_time, char *program_v[], int64_t program_arg_length, u_int64_t _argv_loop_n) {
     //初始化运行参数
     record_init("runtime.data");
-    termview_init(sum, _process_number);
+    
+    now_task_id = begin;
+    if (begin == 0) {
+        over_task = 0;
+        termview_init(sum + 1, _process_number);
+    } else {
+        over_task = begin - 1;
+        termview_init(sum, _process_number);
+    }
+    
     task_sum = sum;
     argv_loop_n = _argv_loop_n;
     process_number = _process_number;

@@ -31,7 +31,7 @@ typedef struct {
     char filename[100];
 } run_process_t;
 
-int run_task_init(u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time, char *program_argv[], int64_t program_arg_length, u_int64_t _argv_loop_n);
+int run_task_init(u_int64_t begin, u_int64_t sum, u_int64_t thread_number, u_int64_t plimit_time, char *program_argv[], int64_t program_arg_length, u_int64_t _argv_loop_n);
 int start_task(u_int64_t number);
 int run_task_start();
 int run_task_destroy();

@@ -25,7 +25,7 @@ test: test.c
 #test.o: test.c
 
 clean:
-	rm -rf TaskRunLimit *.o test a.out
+	rm -rf TaskRunLimit *.o test a.out runtime.data
 
 clean_log:
 	rm -rf err/* out/*

@@ -7,11 +7,14 @@
 
 int main(int argc, char *argv[]) {
     int opt;
-    uint64_t task_number, process_number, time_limit, loop_arg;
-    char *optstring = "s:p:t:h";
+    uint64_t task_number = 10, begin_index = 0,process_number = 2, time_limit = 10000, loop_arg = 1;
+    char *optstring = "b:s:p:t:h";
     while ((opt = getopt(argc, argv, optstring)) != -1) {
         switch (opt)
         {
+        case 'b':   
+            begin_index = atol(optarg);
+            break;
         case 's':
             task_number = atol(optarg);
             break;
@@ -24,7 +27,8 @@ int main(int argc, char *argv[]) {
 
         case 'h':
             printf("Usage: \t -h 打印帮助\n");
-            printf("\t -s 设置总数\n");
+            printf("\t -b 设置开始（包含）\n");
+            printf("\t -s 设置结束（包含）\n");
             printf("\t -p 设置进程数\n");
             printf("\t -t 设置时间限制\n");
             return;
@@ -44,7 +48,7 @@ int main(int argc, char *argv[]) {
             break;
         }
     }
-    run_task_init(task_number, process_number, time_limit, program_v, argc - optind, loop_arg);
+    run_task_init(begin_index, task_number, process_number, time_limit, program_v, argc - optind, loop_arg);
     run_task_start();
     run_task_destroy();
     log_destroy();
