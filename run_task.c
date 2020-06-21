@@ -150,7 +150,12 @@ int start_task(u_int64_t number) {
     //输入参数
     (process_list + number)->task_id = now_task_id;
     sprintf((process_list + number)->program_argv[argv_loop_n], "%d", now_task_id);
-    
+    // int loop_i = 0;
+    // while ((process_list + number)->program_argv[loop_i] != NULL) {
+    //     printf("%s ", (process_list + number)->program_argv[loop_i]);
+    //     loop_i++;
+    // }
+    // printf("\n");
     //打开文件读写
     now_task_id++;
     sprintf((process_list + number)->filename, "%s%d.data", OUTDIR, (process_list + number)->task_id);
