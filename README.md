@@ -17,13 +17,15 @@
 ### 使用方法
 比如
 ```
-./TaskRunLimit -s 20 -p 2 -t 10000 ./TestProgram.bin loop_arg
+./TaskRunLimit -s 20 -p 2 -t 10000 -c "./TestProgram.bin loop_arg"
 ```
 `-s` 测试样例数
 
 `-p` 进程数
 
 `-t` 限制时间（毫秒）
+
+`-c` 执行的程序
 
 接下来就是测试程序和测试程序的参数，需要循环变量的参数设置为`loop_arg`
 
