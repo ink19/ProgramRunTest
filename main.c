@@ -28,11 +28,12 @@ int main(int argc, char *argv[]) {
             break;
 
         case 'h':
-            printf("Usage: \t -h 打印帮助\n");
-            printf("\t -b 设置开始（包含）\n");
-            printf("\t -s 设置结束（包含）\n");
-            printf("\t -p 设置进程数\n");
-            printf("\t -t 设置时间限制\n");
+            printf("Usage: \t -h 打印帮助\n\r");
+            printf("\t -b 设置开始（包含）\n\r");
+            printf("\t -s 设置结束（包含）\n\r");
+            printf("\t -p 设置进程数\n\r");
+            printf("\t -t 设置时间限制\n\r");
+            printf("\t -c 运行的指令\n\r");
             return 0;
             break;
         case 'c':

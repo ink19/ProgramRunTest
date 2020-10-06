@@ -80,7 +80,7 @@ int run_task_init(u_int64_t begin, u_int64_t sum, u_int64_t _process_number, u_i
         }
         (process_list + i)->program_argv[argv_loop_n] = (char *)malloc(sizeof(char) * 100);
         (process_list + i)->program_argv[program_arg_length] = NULL;
-        memset(&((process_list + i)->option), 0, sizeof(uv_process_t));
+        memset(&((process_list + i)->option), 0, sizeof(uv_process_options_t));
 
         (process_list + i)->option.stdio_count = 3;
         (process_list + i)->option.stdio = (uv_stdio_container_t *)malloc(sizeof(uv_stdio_container_t) * 3);
